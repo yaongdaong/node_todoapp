@@ -1,0 +1,40 @@
+<!doctype html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="/public/main.css">
+    
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <%- include('nav.html') %>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+    <div>채팅방</div>
+    <div id="content"></div>
+    <input id="input1">
+    <button id="send">서버에 메세지 보내기</button>
+    <button id="room1">채팅방1 입장</button>
+    <button id="room1-send">채팅방1에서 메세지보내기</button>
+    <script>
+        var socket = io();
+        $('#room1-send').click(function(){
+            socket.emit('room1-send','반가워 채팅방1 사람들아')
+        });
+        $('#room1').click(function(){
+            socket.emit('joinroom','채팅방 입장 시켜줘')
+        });
+        $('#send').click(function(){
+            socket.emit('user-send',$('#input1').val())
+        });
+        socket.on('broadcast', function(data){
+          $('#content').append('<div>' + data + '</div>')
+    });  
+    </script>
+  </body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="/public/main.css">
+    
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <%- include('nav.html') %>
+
+    <h4 class="ml-2 my-3 text-center">채팅방</h4>
+        <div class="container p-4 detail">
+            <div class="row">
+                <div class="col-3">
+                    <ul class="list-group chat-list">
+                        <% for ( let i = 0; i < data.length; i++){ %>
+                        <li class="list-group-item" data-id="<%= data[i]._id %>">   
+                            <h6><%= data[i].title %></h6>
+                            <h6 class="text-small"><%= data[i].member[0] %></h6>
+                        </li> 
+                        <% } %>
+                    </ul>
+                </div>
+
+                <div class="col-8 p-0">
+                    <div class="chat-room">
+                        <ul class="list-group chat-content">
+                            <li><span class="chat-box">채팅방 내용</span></li>
+                            <li><span class="chat-box">채팅방 내용</span></li>
+                            <li><span class="chat-box mine">채팅방 내용</span></li>
+                        </ul>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="chat-input">
+                            <button class="btn btn-secondary" id="send">전송</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+       
+        <script>
+            var 지금누른채팅방id;
+            var eventSource;
+            $('.list-group-item').click(function(){
+                지금누른채팅방id = this.dataset.id;
+                $('.chat-content').html('');
+                if (eventSource != undefined) {
+                    eventSource.close()
+                }
+                eventSource = new EventSource('/message/' + 지금누른채팅방id);
+                eventSource.addEventListener('test', function(e){
+                    var 가져온거 = JSON.parse(e.data);
+                    가져온거.forEach(function(i){
+                        $('.chat-content').append('<li><span class="chat-box">'+i.content+'</span></li>')
+                    });
+                });
+            });
+            $('#send').click(function(){
+                var 채팅내용 = $('#chat-input').val();
+                var 보낼거 = {
+                    parent : 지금누른채팅방id,
+                    content : 채팅내용,
+                }
+            $.post('/message', 보낼거).then(()=>{
+                console.log('전송성공')
+                })
+            })
+        </script>
+  </body>
+</html>
